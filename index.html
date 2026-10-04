@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalkulator Lot XAUUSD</title>
+<!-- Menambahkan Favicon dari URL Gambar -->
+<link rel="icon" type="image/jpeg" href="https://i.pinimg.com/736x/2d/c6/4c/2dc64cacdefcecc7902de1571aa5c098.jpg">
+<style>
+  :root { --bg:#f5f5f7; --card:#fff; --text:#1d1d1f; --muted:#6e6e73; --accent:#c9a227; --border:#d2d2d7; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#111; --card:#1c1c1e; --text:#f5f5f7; --muted:#98989d; --border:#3a3a3c; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+         background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,sans-serif; padding:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px; width:100%; max-width:380px; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  .sub { color:var(--muted); font-size:13px; margin-bottom:20px; }
+  label { display:block; font-size:13px; color:var(--muted); margin:14px 0 6px; }
+  input { width:100%; padding:12px; font-size:16px; border:1px solid var(--border); border-radius:10px;
+          background:transparent; color:var(--text); }
+  input:focus { outline:2px solid var(--accent); border-color:transparent; }
+  .result { margin-top:22px; padding:16px; border-radius:12px; background:rgba(201,162,39,.12); }
+  .lot { font-size:34px; font-weight:700; color:var(--accent); }
+  .row { display:flex; justify-content:space-between; font-size:14px; margin-top:8px; color:var(--muted); }
+  .row b { color:var(--text); }
+  .warn { color:#d9534f; font-size:13px; margin-top:10px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Kalkulator Lot XAUUSD</h1>
+  <div class="sub">1 lot = 100 oz &nbsp;•&nbsp; Lot = Risiko ÷ (Jarak SL × 100)</div>
+
+  <label for="risk">Risiko ($)</label>
+  <input id="risk" type="number" inputmode="decimal" min="0" step="any" placeholder="contoh: 50">
+
+  <label for="sl">Jarak Stop Loss ($ harga)</label>
+  <input id="sl" type="number" inputmode="decimal" min="0" step="any" placeholder="contoh: 5 (500 pips/points)">
+
+  <div class="result" id="result" hidden>
+    <div class="sub" style="margin:0">Lot yang dipakai</div>
+    <div class="lot" id="lotRounded">0.00</div>
+    <div class="row"><span>Lot persis</span><b id="lotExact">-</b></div>
+    <div class="row"><span>Risiko aktual</span><b id="riskActual">-</b></div>
+    <div class="warn" id="warn" hidden>Lot di bawah minimum 0.01. Perbesar risiko atau perkecil SL.</div>
+  </div>
+</div>
+
+<script>
+  const OZ_PER_LOT = 100;
+  const riskEl = document.getElementById('risk');
+  const slEl = document.getElementById('sl');
+  const result = document.getElementById('result');
+
+  function hitung() {
+    const risk = parseFloat(riskEl.value);
+    const sl = parseFloat(slEl.value);
+
+    if (!(risk > 0) || !(sl > 0)) { result.hidden = true; return; }
+
+    const lot = risk / (sl * OZ_PER_LOT);
+    const lotBulat = Math.floor(lot * 100 + 1e-9) / 100;   // bulatkan ke bawah, step 0.01
+    const riskAktual = lotBulat * sl * OZ_PER_LOT;
+
+    document.getElementById('lotExact').textContent = lot.toFixed(4);
+    document.getElementById('lotRounded').textContent = lotBulat.toFixed(2);
+    document.getElementById('riskActual').textContent = '$' + riskAktual.toFixed(2);
+    document.getElementById('warn').hidden = lotBulat >= 0.01;
+    result.hidden = false;
+  }
+
+  riskEl.addEventListener('input', hitung);
+  slEl.addEventListener('input', hitung);
+</script>
+</body>
+</html>
